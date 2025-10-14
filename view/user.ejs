@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Attendance</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="container">
+    <h1>👤 <%= user.name %> (ID: <%= user.id %>)</h1>
+
+    <form action="/mark" method="POST" class="attendance-form">
+      <button type="submit" name="status" value="Present" class="present-btn">Mark Present</button>
+      <button type="submit" name="status" value="Absent" class="absent-btn">Mark Absent</button>
+    </form>
+
+    <h2>📅 Attendance Record</h2>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+      <% user.attendance.forEach((record) => { %>
+        <tr>
+          <td><%= record.date %></td>
+          <td class="<%= record.status.toLowerCase() %>"><%= record.status %></td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
