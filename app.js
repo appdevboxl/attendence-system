@@ -33,7 +33,7 @@ app.get('/user', (req, res) => {
 });
 
 
-app.use("/",parentRouter)
+app.use("/api",parentRouter)
 
 
 const PORT = process.env.PORT || 3000;
