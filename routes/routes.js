@@ -5,9 +5,15 @@ const jwt = require("jsonwebtoken")
 
 //modals
 const User = require("../models/user")
-const Leave=require("../models/leave")
-const Attendance=require("../models/attendance")
+const Leave = require("../models/leave")
+const Attendance = require("../models/attendance")
 
+
+router.use((req, res, next) => {
+  console.log(`Request: [${req.method}] ${req.originalUrl}`);
+//   console.log(req.params)
+  next();
+});
 
 
 // router.get('/createAdmin', async (req, res) => {
@@ -88,16 +94,7 @@ router.post("/addUser", async (req, res) => {
         // );
 
         // Send response
-        res.status(201).json({
-            success: true,
-            message: "User registered successfully!",
-            //   token,
-            //   user: {
-            //     id: newUser._id,
-            //     name: newUser.name,
-            //     email: newUser.email,
-            //   },
-        });
+        res.redirect('admin');
     } catch (error) {
         console.error("Signup error:", error);
         res.status(500).json({ message: "Server error. Please try again." });
@@ -114,7 +111,7 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({ message: "Please fill in all fields." });
         }
 
-       
+
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: "Invalid email or password." });
@@ -128,7 +125,7 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
-            { expiresIn: "1d" } 
+            { expiresIn: "1d" }
         );
 
         //  Send response
@@ -150,52 +147,76 @@ router.post("/login", async (req, res) => {
 });
 
 
-
-
-
-
 // USER
 
-router.post('/checkin/:userId', async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const today = new Date();
-    today.setHours(0,0,0,0); // start of today
+router.get("/punchin/:userId", async (req, res) => {
+    try {
+        console.log("in checkin")
+        const userId = req.params.userId;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // start of today
 
-    //  Check if leave is approved today
-    const leave = await Leave.findOne({
-      userId,
-      date: today,
-      status: 'approved'
-    });
+        //  Check if leave is approved today
+        const leave = await Leave.findOne({
+            userId,
+            date: today,
+            status: 'approved'
+        });
 
-    if (leave) {
-      return res.status(403).json({ message: 'Leave approved for today. Check-in not allowed.' });
+        if (leave) {
+            return res.status(403).json({ message: 'Leave approved for today. Check-in not allowed.' });
+        }
+
+        //  Check if already checked in today
+        const existingAttendance = await Attendance.findOne({
+            userId,
+            date: today
+        });
+
+        if (existingAttendance) {
+            return res.status(400).json({ message: 'Already checked in today.' });
+        }
+
+        // Create new attendance record
+        const attendance = await Attendance.create({
+            userId,
+            checkIn: new Date(),
+            date: today
+        });
+
+        res.status(200).json({ message: 'Checked in successfully', attendance });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
-
-    //  Check if already checked in today
-    const existingAttendance = await Attendance.findOne({
-      userId,
-      date: today
-    });
-
-    if (existingAttendance) {
-      return res.status(400).json({ message: 'Already checked in today.' });
-    }
-
-    // Create new attendance record
-    const attendance = await Attendance.create({
-      userId,
-      checkIn: new Date(),
-      date: today
-    });
-
-    res.status(200).json({ message: 'Checked in successfully', attendance });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
 });
+
+router.post('/punchout/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // start of today
+
+        // Block if leave approved
+        const leave = await Leave.findOne({ userId, date: today, status: 'approved' });
+        if (leave) return res.status(403).json({ message: 'Leave approved today. Cannot checkout.' });
+
+        // Find today's attendance
+        const attendance = await Attendance.findOne({ userId, date: today });
+        if (!attendance) return res.status(400).json({ message: 'No check-in found today.' });
+        if (attendance.checkOut) return res.status(400).json({ message: 'Already checked out today.' });
+
+        // Set checkout time & calculate total hours
+        attendance.checkOut = new Date();
+        await attendance.save();
+
+        res.status(200).json({ success: true, message: 'Checked out successfully', attendance });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 module.exports = router;

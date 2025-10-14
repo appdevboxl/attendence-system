@@ -21,9 +21,10 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user','employee'], default: 'employee' },
+    role: { type: String, enum: ['user', 'employee'], default: 'employee' },
     isActive: { type: Boolean, default: true },
-
+    leavesTaken: { type: Number, default:0},
+    
     //   attendance: [attendanceSchema],
     //   leaves: [leaveSchema],   // ✅ separate leave requests
     //   leaveBalance: {
