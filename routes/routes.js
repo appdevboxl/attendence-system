@@ -82,16 +82,7 @@ router.post("/addUser", async (req, res) => {
         // );
 
         // Send response
-        res.status(201).json({
-            success: true,
-            message: "User registered successfully!",
-            //   token,
-            //   user: {
-            //     id: newUser._id,
-            //     name: newUser.name,
-            //     email: newUser.email,
-            //   },
-        });
+        res.redirect('admin');
     } catch (error) {
         console.error("Signup error:", error);
         res.status(500).json({ message: "Server error. Please try again." });
