@@ -1,18 +1,19 @@
 // config/db.js
-const mongoose = require('mongoose');
+require("dotenv").config()
+const mongoose=require("mongoose")
 
 const connectDB = async () => {
   try {
-    // Replace <username>, <password>, <dbname> with your MongoDB Atlas or local DB details
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    console.log(process.env.MONGO_URL)
+    const conn = await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected:` );
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    process.exit(1); // Exit process with failure
+    process.exit(1);
   }
 };
 
