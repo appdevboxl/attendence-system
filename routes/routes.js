@@ -1,8 +1,14 @@
 const express = require("express")
-const User = require("../models/user")
 const router = express.Router()
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+
+//modals
+const User = require("../models/user")
+const Leave=require("../models/leave")
+const Attendance=require("../models/attendance")
+
+
 
 // router.get('/createAdmin', async (req, res) => {
 //   try {
@@ -121,8 +127,8 @@ router.post("/login", async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id, email: user.email },
-            process.env.JWT_SECRET || "secretkey",
-            { expiresIn: "1d" } // token expires in 1 day
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" } 
         );
 
         //  Send response
@@ -148,12 +154,48 @@ router.post("/login", async (req, res) => {
 
 
 
-
-
 // USER
 
+router.post('/checkin/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const today = new Date();
+    today.setHours(0,0,0,0); // start of today
 
+    //  Check if leave is approved today
+    const leave = await Leave.findOne({
+      userId,
+      date: today,
+      status: 'approved'
+    });
 
+    if (leave) {
+      return res.status(403).json({ message: 'Leave approved for today. Check-in not allowed.' });
+    }
 
+    //  Check if already checked in today
+    const existingAttendance = await Attendance.findOne({
+      userId,
+      date: today
+    });
+
+    if (existingAttendance) {
+      return res.status(400).json({ message: 'Already checked in today.' });
+    }
+
+    // Create new attendance record
+    const attendance = await Attendance.create({
+      userId,
+      checkIn: new Date(),
+      date: today
+    });
+
+    res.status(200).json({ message: 'Checked in successfully', attendance });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 module.exports = router;
