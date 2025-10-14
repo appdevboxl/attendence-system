@@ -122,11 +122,13 @@ router.post("/login", async (req, res) => {
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             maxAge: 24 * 60 * 60 * 1000
-        }).json({
-            success: true,
-            message: "Logged In Successfully",
-            user
-        });
+        })
+        // .json({
+        //     success: true,
+        //     message: "Logged In Successfully",
+        //     user
+        // });
+        res.render('user.ejs',{employee:user})
 
     } catch (error) {
         console.error("Login error:", error);
@@ -134,6 +136,10 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.get("/logout", (req, res) => {
+  res.clearCookie("token"); // if you use cookies for auth
+  res.redirect("/");
+});
 
 
 
