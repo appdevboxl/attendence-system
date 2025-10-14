@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Attendance</title>
+  <link rel="stylesheet" href="/userpage.css" />
+</head>
+<body>
+  <header>
+    <h2>Attendance System</h2>
+    <hr />
+  </header>
+
+  <div class="container">
+    <h1>👤 Divy</h1>
+
+    <form action="/mark" method="POST" class="attendance-form">
+      <button type="submit" name="status" value="Present" class="present-btn">Mark Present</button>
+      <button type="submit" name="status" value="Absent" class="absent-btn">Mark Absent</button>
+    </form>
+
+    <h2>📅 Attendance Record</h2>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+      <!-- Static data rows -->
+      <tr>
+        <td>2025-10-12</td>
+        <td class="present">Present</td>
+      </tr>
+      <tr>
+        <td>2025-10-11</td>
+        <td class="absent">Absent</td>
+      </tr>
+      <tr>
+        <td>2025-10-10</td>
+        <td class="present">Present</td>
+      </tr>
+    </table>
+  </div>
+
+  <hr />
+  <footer>
+    <p>© 2025 Attendance System</p>
+  </footer>
+</body>
+</html>

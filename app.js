@@ -21,7 +21,7 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/user', (req, res) => {
-  res.render('user');
+  res.render('user.ejs');
 });
 
 const PORT = process.env.PORT || 3000;
