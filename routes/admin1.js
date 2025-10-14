@@ -2,6 +2,9 @@ const express = require("express")
 const User=require("../models/user")
 const Announcement=require("../models/announcement")
 const router = express.Router()
+const methodOverride = require("method-override");
+router.use(methodOverride("_method"));
+
 
 
 router.get('/admin', async (req, res) => {
@@ -38,6 +41,39 @@ router.post('/announcements/delete/:id', async (req, res) => {
   }
 });
 
+
+router.get("/users/edit/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send("User not found");
+
+    res.render("editUser", { user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+router.post("/users/edit/:id", async (req, res) => {
+  try {
+    const { name, email ,isActive } = req.body;
+    await User.findByIdAndUpdate(req.params.id, { name, email ,isActive: isActive === "true" || isActive === "on"  });
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).send("Server error");
+  }
+});
+
+router.delete("/users/delete/:id", async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).send("Server error");
+  }
+});
 
 
 
