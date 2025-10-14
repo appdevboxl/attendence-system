@@ -155,7 +155,7 @@ router.get("/logout", (req, res) => {
 
 // USER
 
-router.get("/punchin/:userId", async (req, res) => {
+router.post('/punchin/:userId', async (req, res) => {
     try {
         console.log("in checkin")
         const userId = req.params.userId;

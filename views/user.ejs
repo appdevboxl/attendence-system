@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,7 @@
   <!-- Bootstrap CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
   <!-- Navbar -->
@@ -30,30 +32,42 @@
           <div class="card-body">
             <h5 class="card-title">Employee Details</h5>
             <hr>
-            <p><strong>ID:</strong> <%= employee._id %></p>
-            <p><strong>Name:</strong> <%= employee.name %></p>
-            <p><strong>Email:</strong> <%= employee.email %></p>
-            <p><strong>Role:</strong> <%= employee.role %></p>
-            <p><strong>Active:</strong> <%= employee.isActive ? "Yes" : "No" %></p>
-            <p><strong>Created:</strong> <%= new Date(employee.createdAt).toLocaleString() %></p>
+            <p><strong>ID:</strong>
+              <%= employee._id %>
+            </p>
+            <p><strong>Name:</strong>
+              <%= employee.name %>
+            </p>
+            <p><strong>Email:</strong>
+              <%= employee.email %>
+            </p>
+            <p><strong>Role:</strong>
+              <%= employee.role %>
+            </p>
+            <p><strong>Active:</strong>
+              <%= employee.isActive ? "Yes" : "No" %>
+            </p>
+            <p><strong>Created:</strong>
+              <%= new Date(employee.createdAt).toLocaleString() %>
+            </p>
           </div>
         </div>
-
+        <input type="hidden" id="employeeId" value=<%=employee._id%>>
         <!-- Punch In / Punch Out -->
         <div class="card shadow-sm mb-4">
           <div class="card-body">
             <h5 class="card-title">Attendance</h5>
             <hr>
-            <form action="/punch" method="POST" class="mb-3">
+            <form action="/punch" id="punchForm" method="POST" class="mb-3">
               <input type="hidden" name="employeeId" value="<%= employee._id %>">
               <div class="d-grid gap-2">
-                <button type="submit" name="action" value="in" class="btn btn-success">Punch In</button>
-                <button type="submit" name="action" value="out" class="btn btn-danger">Punch Out</button>
+                <button type="button" class="btn btn-success" data-action="in">Punch In</button>
+                <button type="button" class="btn btn-danger" data-action="out">Punch Out</button>
               </div>
             </form>
 
             <!-- Attendance Table -->
-            
+
           </div>
         </div>
 
@@ -62,5 +76,34 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.querySelectorAll('#punchForm button').forEach(button => {
+      button.addEventListener('click', async () => {
+        const action = button.dataset.action; // "in" or "out"
+        const employeeId = document.getElementById('employeeId').value;
+
+        // Determine the API URL based on action
+        const url = action === 'in'
+          ? `http://localhost:3000/punchin/${employeeId}`
+          : `http://localhost:3000/punchout/${employeeId}`;
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const data = await response.json();
+          alert(data.message); // show message from API
+        } catch (err) {
+          console.error(err);
+          alert('Something went wrong');
+        }
+      });
+    });
+  </script>
 </body>
+
 </html>
