@@ -76,22 +76,43 @@
 
       <!-- Attendance Section -->
       <section id="attendance" class="mb-5">
-        <div class="card shadow-sm">
-          <div class="card-header bg-success text-white">Attendance Records</div>
-          <div class="card-body">
-            <table class="table table-bordered">
-              <thead><tr><th>User</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
-              <tbody>
-                <tr><td>John Doe</td><td>2025-10-14</td><td>Present</td><td><button class="btn btn-primary btn-sm">Update</button></td></tr>
-                <tr><td>Jane Smith</td><td>2025-10-14</td><td>Absent</td><td><button class="btn btn-primary btn-sm">Update</button></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+  <div class="card shadow-sm">
+    <div class="card-header bg-success text-white">Attendance Records</div>
+    <div class="card-body table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Date</th>
+            <th>Day Type</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% attendanceRecords.forEach(record => { %>
+            <tr>
+              <td><%= record.userId ? record.userId.name : "Unknown" %></td>
+              <td><%= record.userId ? record.userId.email : "-" %></td>
+              <td><%= record.date.toISOString().split("T")[0] %></td>
+              <td><%= record.dayType || "-" %></td>
+              <td><%= record.checkIn || "-" %></td>
+              <td><%= record.checkOut || "-" %></td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="confirmUpdate('<%= record._id %>')">Update</button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
       <!-- Holidays Section -->
-      <section id="leaves" class="mb-5">
+      <!-- <section id="leaves" class="mb-5">
         <div class="card shadow-sm">
           <div class="card-header bg-warning">Holidays & Custom Leaves</div>
           <div class="card-body">
@@ -107,7 +128,7 @@
             </ul>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Announcements Section -->
       <section id="announcements" class="mb-5">
@@ -171,6 +192,12 @@
     });
   });
 </script>
-
+<script>
+  function confirmUpdate(id) {
+    if (confirm("Are you sure you want to update this record?")) {
+      window.location.href = `/attendance/update/${id}`;
+    }
+  }
+</script>
 </body>
 </html>
