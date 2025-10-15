@@ -11,7 +11,7 @@ const attendanceSchema = new mongoose.Schema({
     totalHours: { type: Number },
 });
 
-attendanceSchema.pre('save', function (next) {
+attendanceSchema.pre(['save',"findOneAndUpdate"], function (next) {
     if (this.checkIn && this.checkOut) {
         const [inHour, inMin] = this.checkIn.split(':').map(Number);
         const [outHour, outMin] = this.checkOut.split(':').map(Number);
