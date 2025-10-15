@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken")
 const User = require("../models/user")
 const Leave = require("../models/leave")
 const Attendance = require("../models/attendance")
+const announcement = require("../models/announcement")
 
 
 router.use((req, res, next) => {
@@ -127,7 +128,7 @@ router.post("/login", async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-
+            const announcements = await announcement.find().sort({ createdAt: -1 });
         //  Send response
         res.cookie("token", token, {
             httpOnly: true,
@@ -140,7 +141,7 @@ router.post("/login", async (req, res) => {
         //     message: "Logged In Successfully",
         //     user
         // });
-        res.render('user.ejs',{employee:user})
+        res.render('user.ejs',{employee:user,announcements})
 
     } catch (error) {
         console.error("Login error:", error);
